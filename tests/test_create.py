@@ -376,3 +376,15 @@ def test_create_mulitple_hashformats_double_hashformat(fs, simple_mhl_history):
         print(result.output)
 
     assert result.exit_code == 0
+
+
+@freeze_time("2020-01-16 09:15:00")
+def test_scenario_06(fs):
+    fs.create_file("A004R2EC/Clips/A004C001R2EC", contents="This files accessibility will be restricted")
+    fs.create_file("A004R2EC/Clips/A004C002R2EC", contents="clip02")
+    fs.create_file("A004R2EC/Clips/A004C003R2EC", contents="clip03")
+    os.chmod("A004R2EC/Clips/A004C001R2EC", 0o0200)
+
+    runner = CliRunner()
+    result = runner.invoke(ascmhl.commands.create, ["-v", "/A004R2EC", "-h", "xxh64"])
+    assert result.exit_code == 22
