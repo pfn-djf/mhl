@@ -45,6 +45,13 @@ class NewFilesFoundException(click.ClickException):
         super().__init__("New files not referenced in the ASC MHL history have been found")
 
 
+class FileAccessPermissionDenied(click.ClickException):
+    exit_code = 22
+
+    def __init__(self):
+        super().__init__("File access has been denied for at least one file")
+
+
 class NoMHLHistoryException(click.ClickException):
     exit_code = 30
 
