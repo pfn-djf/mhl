@@ -231,7 +231,7 @@ def create_for_folder_subcommand(
     # start a verification session on the existing history
     session = MHLGenerationCreationSession(existing_history, ignore_spec)
 
-    num_failed_reading_permission = 0
+    num_failed_reading_permission_file = 0
     num_failed_verifications = 0
     # store the directory hashes of sub folders so we can use it when calculating the hash of the parent folder
     # the mapping lookups will follow the dictionary format of [string: [hash_format: hash_value]] where string
@@ -253,7 +253,7 @@ def create_for_folder_subcommand(
             not_found_paths.discard(file_path)
             if not os.access(file_path, os.R_OK):
                 logger.verbose(f"Could not read file at: {file_path}, reading permission is not set for file")
-                num_failed_reading_permission += 1
+                num_failed_reading_permission_file += 1
                 continue
             for hash_list in existing_history.hash_lists:
                 for media_hash in hash_list.media_hashes:
@@ -387,8 +387,11 @@ def create_for_folder_subcommand(
 
     exception = test_for_missing_files(not_found_paths, root_path, ignore_spec)
 
-    if num_failed_reading_permission > 0:
+    if num_failed_reading_permission_file > 0:
         exception = errors.FileAccessPermissionDenied()
+
+    # if num_failed_reading_permission_folder > 0:
+    #     exception = errors.FolderAccessPermissionDenied
 
     if num_failed_verifications > 0:
         exception = errors.VerificationFailedException()
