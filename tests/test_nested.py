@@ -197,3 +197,18 @@ def test_create_nested_mhl_chain_missing(fs):
     result = runner.invoke(ascmhl.commands.diff, [abspath_conversion_tests("/root")])
     assert result.exception
     assert result.exit_code == 32
+
+
+def test_create_nested_ignore_old_files_in_histories(fs, nested_mhl_histories):
+    runner = CliRunner()
+    result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root/A"), "-h", "xxh64"])
+    assert result.exit_code == 0
+
+    os.remove("/root/A/AA/AA1.txt")
+    result = runner.invoke(
+        ascmhl.commands.create, [abspath_conversion_tests("/root/A/"), "-h", "xxh64", "-i", "/root/A/AA/AA1.txt"]
+    )
+    assert result.exit_code == 0
+
+    result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root"), "-h", "xxh64", "-v"])
+    assert result.exit_code == 0
