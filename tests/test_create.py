@@ -376,3 +376,23 @@ def test_create_mulitple_hashformats_double_hashformat(fs, simple_mhl_history):
         print(result.output)
 
     assert result.exit_code == 0
+
+
+@freeze_time("2020-01-16 09:15:00")
+def test_create_restricted_file_access(fs, nested_mhl_histories):
+    os.chmod("/root/B/B1.txt", 0o222)
+
+    runner = CliRunner()
+    result = runner.invoke(ascmhl.commands.create, ["-v", "/root", "-h", "xxh64", "-v"])
+    print(result.output)
+    assert result.exit_code == 22
+
+
+@freeze_time("2020-01-16 09:15:00")
+def test_create_restricted_folder_access(fs, nested_mhl_histories):
+    os.chmod("/root/A", mode=0o0222)
+
+    runner = CliRunner()
+    result = runner.invoke(ascmhl.commands.create, ["-v", "/root", "-h", "xxh64", "-v"])
+    print(result.output)
+    assert result.exit_code == 22
