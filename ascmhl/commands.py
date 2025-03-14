@@ -227,7 +227,11 @@ def create_for_folder_subcommand(
 
     # create the ignore specification
     ignore_spec = ignore.MHLIgnoreSpec(existing_history.latest_ignore_patterns(), ignore_list, ignore_spec_file)
-
+    # Get the ignore patterns from nested histories with their respective paths so that test_for_missing_files
+    # won't throw an error for ignored files in nested directories which have been deleted
+    nested_ignore_spec = ignore.MHLIgnoreSpec(
+        existing_history.latest_ignore_pattern_from_nested_histories(), ignore_list, ignore_spec_file
+    )
     # start a verification session on the existing history
     session = MHLGenerationCreationSession(existing_history, ignore_spec)
 
@@ -380,7 +384,7 @@ def create_for_folder_subcommand(
         not_found_paths = not_found_paths - found_file_paths
     commit_session(session, author_name, author_email, author_phone, author_role, location, comment)
 
-    exception = test_for_missing_files(not_found_paths, root_path, ignore_spec)
+    exception = test_for_missing_files(not_found_paths, root_path, nested_ignore_spec)
     if num_failed_verifications > 0:
         exception = errors.VerificationFailedException()
 

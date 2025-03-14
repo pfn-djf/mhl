@@ -98,6 +98,13 @@ class MHLHistory:
             return None
         return hash_list.process_info.ignore_spec.get_pattern_list()
 
+    def latest_ignore_pattern_from_nested_histories(self) -> Optional[List[str]]:
+        cumulated_ignores = []
+        for history in self.child_histories:
+            cumulated_ignores += history.latest_ignore_patterns()
+
+        return cumulated_ignores
+
     # methods to query and compare hashes
     def find_original_hash_entry_for_path(self, relative_path: str) -> Optional[MHLHashEntry]:
         """Searches the history for the first (original) hash of a file
