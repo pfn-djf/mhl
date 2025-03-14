@@ -379,23 +379,20 @@ def test_create_mulitple_hashformats_double_hashformat(fs, simple_mhl_history):
 
 
 @freeze_time("2020-01-16 09:15:00")
-def test_create_restricted_file_access(fs):
-    fs.create_file("A004R2EC/Clips/A004C001R2EC", contents="This files accessibility will be restricted")
-    fs.create_file("A004R2EC/Clips/A004C002R2EC", contents="clip02")
-    fs.create_file("A004R2EC/Clips/A004C003R2EC", contents="clip03")
-    os.chmod("A004R2EC/Clips/A004C001R2EC", 0o0000)
+def test_create_restricted_file_access(fs, nested_mhl_histories):
+    os.chmod("/root/B/B1.txt", 0o222)
 
     runner = CliRunner()
-    result = runner.invoke(ascmhl.commands.create, ["-v", "/A004R2EC", "-h", "xxh64"])
+    result = runner.invoke(ascmhl.commands.create, ["-v", "/root", "-h", "xxh64", "-v"])
+    print(result.output)
     assert result.exit_code == 22
 
 
 @freeze_time("2020-01-16 09:15:00")
-def test_create_restricted_folder_access(fs, simple_mhl_folder):
-    os.chmod("/root/A", mode=0o0000)
+def test_create_restricted_folder_access(fs, nested_mhl_histories):
+    os.chmod("/root/A", mode=0o0222)
 
     runner = CliRunner()
-    result = runner.invoke(ascmhl.commands.create, ["-v", "/root", "-h", "xxh64"])
-
-    os.chmod("/root/A", mode=0o0755)
-    assert result.exit_code == 0
+    result = runner.invoke(ascmhl.commands.create, ["-v", "/root", "-h", "xxh64", "-v"])
+    print(result.output)
+    assert result.exit_code == 22

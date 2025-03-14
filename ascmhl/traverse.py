@@ -35,10 +35,6 @@ def post_order_lexicographic(top: str, ignore_pathspec: pathspec.PathSpec = None
             if os.path.basename(os.path.normpath(file_path)) != ascmhl_folder_name:
                 logger.verbose(f"ignoring filepath {file_path}")
             continue
-        if not os.access(file_path, os.R_OK):
-            logger.verbose(f"Could not read folder at: {file_path}, reading permission is not set for folder")
-            # FIXME: find a way to throw an error from create_for_folder_subcommand() if folder is inaccessible
-            continue
         path = join(top, name)
         children.append((name, isdir(path)))
 
