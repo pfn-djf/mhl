@@ -212,3 +212,25 @@ def test_create_nested_ignore_old_files_in_histories(fs, nested_mhl_histories):
 
     result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root"), "-h", "xxh64", "-v"])
     assert result.exit_code == 0
+
+
+def test_create_nested_removed_files_in_histories_and_restricted_access(fs, nested_mhl_histories):
+    runner = CliRunner()
+    result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root/A"), "-h", "xxh64"])
+    print(result.output)
+    assert result.exit_code == 0
+
+    os.remove("/root/A/AA/AA1.txt")
+    result = runner.invoke(
+        ascmhl.commands.create, [abspath_conversion_tests("/root/A/"), "-h", "xxh64", "-i", "/root/A/AA/AA1.txt"]
+    )
+    print(result.output)
+    assert result.exit_code == 0
+
+    result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root"), "-h", "xxh64", "-v"])
+    assert result.exit_code == 0
+
+    os.chmod("/root/B/B1.txt", 0o222)
+    result = runner.invoke(ascmhl.commands.create, ["-v", "/root", "-h", "xxh64", "-v"])
+    print(result.output)
+    assert result.exit_code == 22
