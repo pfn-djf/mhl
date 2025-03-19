@@ -101,7 +101,12 @@ class MHLHistory:
     def latest_ignore_pattern_from_nested_histories(self) -> Optional[List[str]]:
         cumulated_ignores = []
         for history in self.child_histories:
-            cumulated_ignores += history.latest_ignore_patterns()
+            for pattern in history.latest_ignore_patterns():
+                if os.path.isabs(pattern):
+                    cumulated_ignores.append(pattern)
+                else:
+                    path = history.get_root_path()
+                    cumulated_ignores.append(path + "/**/" + pattern)
 
         return cumulated_ignores
 

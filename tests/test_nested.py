@@ -211,4 +211,5 @@ def test_create_nested_ignore_old_files_in_histories(fs, nested_mhl_histories):
     assert result.exit_code == 0
 
     result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root"), "-h", "xxh64", "-v"])
+    print(result.output)
     assert result.exit_code == 0
