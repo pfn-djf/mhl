@@ -221,7 +221,11 @@ def create_for_folder_subcommand(
     # traversing the file system, so this set will at the end contain the file paths not found in the file system
     not_found_paths = existing_history.set_of_file_paths()
     renamed_files = existing_history.renamed_path_with_previous_path()
-    not_found_paths = {p if renamed_files.get(p, None) is None else renamed_files[p] for p in not_found_paths}
+    for old, new in renamed_files.items():
+        if old in not_found_paths:
+            not_found_paths.remove(old)
+            not_found_paths.add(new)
+
     new_paths = set()
     missing_asc_mhl_folder = set()
 
@@ -1026,7 +1030,10 @@ def diff_entire_folder_against_full_history_subcommand(root_path, verbose, ignor
     # traversing the file system, so this set will at the end contain the file paths not found in the file system
     not_found_paths = existing_history.set_of_file_paths()
     renamed_files = existing_history.renamed_path_with_previous_path()
-    not_found_paths = {p if renamed_files.get(p, None) is None else renamed_files[p] for p in not_found_paths}
+    for old, new in renamed_files.items():
+        if old in not_found_paths:
+            not_found_paths.remove(old)
+            not_found_paths.add(new)
 
     num_failed_verifications = 0
     num_new_files = 0
