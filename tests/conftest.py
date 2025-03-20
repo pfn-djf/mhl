@@ -90,3 +90,47 @@ def simple_mhl_folder(fs):
     # create a simple folder structure with two files
     fs.create_file("/root/Stuff.txt", contents="stuff\n")
     fs.create_file("/root/A/A1.txt", contents="A1\n")
+
+
+@pytest.fixture
+@freeze_time("2020-01-15 13:00:00")
+def nested_mhl_histories_various_hash_formats(fs):
+    # create mhl histories on different directly levels
+    fs.create_file("/root/Stuff.txt", contents="stuff\n")
+    runner = CliRunner()
+    result = runner.invoke(ascmhl.commands.create, [abspath("/root"), "-h", "xxh64"])
+    assert result.exit_code == 0
+
+    fs.create_file("/root/A/AA/AA1.txt", contents="AA1\n")
+    fs.create_file("/root/A/AB/AB1.txt", contents="AB1\n")
+    result = runner.invoke(ascmhl.commands.create, [abspath("/root/A"), "-h", "c4"])
+    assert result.exit_code == 0
+
+    fs.create_file("/root/B/B1.txt", contents="B1\n")
+    result = runner.invoke(ascmhl.commands.create, [abspath("/root/B"), "-h", "md5"])
+    assert result.exit_code == 0
+
+    fs.create_file("/root/B/BA/BA1.txt", contents="BA1\n")
+    fs.create_file("/root/B/BB/BB1.txt", contents="BB1\n")
+    result = runner.invoke(ascmhl.commands.create, [abspath("/root/B/BA"), "-h", "sha1"])
+    assert result.exit_code == 0
+
+    result = runner.invoke(ascmhl.commands.create, [abspath("/root/B/BB"), "-h", "sha1"])
+    assert result.exit_code == 0
+
+
+@pytest.fixture
+@freeze_time("2020-01-15 13:00:00")
+def multiple_mhl_histories_no_root(fs):
+    # create mhl histories on different directly levels
+    fs.create_file("/root/Stuff.txt", contents="stuff\n")
+    runner = CliRunner()
+
+    fs.create_file("/root/A/AA/AA1.txt", contents="AA1\n")
+    fs.create_file("/root/A/AB/AB1.txt", contents="AB1\n")
+    result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root/A/AA"), "-h", "xxh64"])
+    assert result.exit_code == 0
+
+    fs.create_file("/root/B/B1.txt", contents="B1\n")
+    result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root/B"), "-h", "xxh64"])
+    assert result.exit_code == 0
