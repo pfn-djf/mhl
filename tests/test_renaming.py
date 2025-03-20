@@ -364,6 +364,10 @@ def test_renaming_create_without_root_history(fs, multiple_mhl_histories_no_root
     print(result.output)
     assert result.exit_code == 0
 
+    result = runner.invoke(ascmhl.commands.diff, [abspath_conversion_tests("/root"), "-v"])
+    print(result.output)
+    assert result.exit_code == 0
+
 
 def test_renaming_create_various_hash_formats(fs, nested_mhl_histories_various_hash_formats):
     runner = CliRunner()
@@ -371,5 +375,9 @@ def test_renaming_create_various_hash_formats(fs, nested_mhl_histories_various_h
     os.rename("/root/A/AB/AB1.txt", "/root/A/AB/AB1_renamed.txt")
 
     result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root"), "-v", "-dr", "-h", "xxh128"])
+    print(result.output)
+    assert result.exit_code == 0
+
+    result = runner.invoke(ascmhl.commands.diff, [abspath_conversion_tests("/root"), "-v"])
     print(result.output)
     assert result.exit_code == 0
