@@ -199,17 +199,29 @@ def test_create_nested_mhl_chain_missing(fs):
     assert result.exit_code == 32
 
 
-def test_create_nested_ignore_old_files_in_histories(fs, nested_mhl_histories):
+def test_create_nested_ignore_patterns_in_histories(fs, nested_mhl_histories):
     runner = CliRunner()
+    fs.create_file("/root/A/AA/AA1.RMD", contents="Lorem ipsum dolor")
+    fs.create_file("/root/A/AB/AB1.RMD", contents="sit amet con vota")
+    fs.create_file("/root/B/BA/B1.RMD", contents="lirum alamru aexti")
+    fs.create_file("/root/A/AA/AA2.txt", contents="Lorem ipsum dolor")
+
     result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root/A"), "-h", "xxh64"])
     assert result.exit_code == 0
 
     os.remove("/root/A/AA/AA1.txt")
     result = runner.invoke(
-        ascmhl.commands.create, [abspath_conversion_tests("/root/A/"), "-h", "xxh64", "-i", "/root/A/AA/AA1.txt"]
+        ascmhl.commands.create, [abspath_conversion_tests("/root/A"), "-v", "-h", "xxh64", "-i", "*.txt"]
     )
-    assert result.exit_code == 0
-
-    result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root"), "-h", "xxh64", "-v"])
     print(result.output)
     assert result.exit_code == 0
+
+    result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root"), "-v"])
+    print(result.output)
+    assert result.exit_code == 0
+
+    os.remove("/root/B/BB/BB1.txt")
+
+    result = runner.invoke(ascmhl.commands.create, [abspath_conversion_tests("/root"), "-v"])
+    print(result.output)
+    assert result.exit_code == 10
