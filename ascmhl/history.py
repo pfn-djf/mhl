@@ -173,6 +173,19 @@ class MHLHistory:
                     hash_formats.append(hash_entry.hash_format)
         return hash_formats
 
+    def find_hashes_for_path(self, path) -> Optional[List[tuple[str, MHLHashEntry]]]:
+        """Returns all hashes for a path as tuple(hash_format, path)"""
+        hashes_for_path = []
+        path_history, relative_path = self.find_history_for_path(
+            self.get_relative_file_path(path)
+        )
+        path_hash_formats = path_history.find_existing_hash_formats_for_path(relative_path)
+        for hash_format in path_hash_formats:
+            path_hash = path_history.find_first_hash_entry_for_path(relative_path, hash_format)
+            hash_tuple = (hash_format, path_hash)
+            hashes_for_path.append(hash_tuple)
+        return hashes_for_path
+
     # def handling of child histories
     def find_history_for_path(self, relative_path: str) -> Tuple[MHLHistory, str]:
         if len(self.child_histories) == 0:
