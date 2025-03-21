@@ -95,12 +95,8 @@ def simple_mhl_folder(fs):
 @pytest.fixture
 @freeze_time("2020-01-15 13:00:00")
 def nested_mhl_histories_various_hash_formats(fs):
-    # create mhl histories on different directly levels
-    fs.create_file("/root/Stuff.txt", contents="stuff\n")
     runner = CliRunner()
-    result = runner.invoke(ascmhl.commands.create, [abspath("/root"), "-h", "xxh64"])
-    assert result.exit_code == 0
-
+    # create mhl histories on different directory levels
     fs.create_file("/root/A/AA/AA1.txt", contents="AA1\n")
     fs.create_file("/root/A/AB/AB1.txt", contents="AB1\n")
     result = runner.invoke(ascmhl.commands.create, [abspath("/root/A"), "-h", "c4"])
@@ -116,6 +112,10 @@ def nested_mhl_histories_various_hash_formats(fs):
     assert result.exit_code == 0
 
     result = runner.invoke(ascmhl.commands.create, [abspath("/root/B/BB"), "-h", "sha1"])
+    assert result.exit_code == 0
+
+    fs.create_file("/root/Stuff.txt", contents="stuff\n")
+    result = runner.invoke(ascmhl.commands.create, [abspath("/root"), "-h", "xxh64"])
     assert result.exit_code == 0
 
 
